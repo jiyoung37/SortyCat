@@ -1,0 +1,5 @@
+pillow
+pillow-heif
+mutagen
+tkinterdnd2
+pyinstaller
