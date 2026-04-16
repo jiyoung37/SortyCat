@@ -176,6 +176,13 @@ def make_unique_path(target_path: Path) -> Path:
             return new_path
         counter += 1
 
+def resource_path(filename):
+        try:
+            base_path = sys._MEIPASS
+        except Exception:
+            base_path = os.path.abspath(".")
+        return os.path.join(base_path, filename)
+
 
 class Logger:
     def __init__(self):
@@ -317,14 +324,20 @@ class SorterEngine:
             self.sort_into_date_folders(folder_path, dry_run=dry_run)
 
         return errors == 0
-
-
+   
 class PhotoSorterApp:
     def __init__(self, root):
         self.root = root
-        self.root.title("Photo & Video Sorter")
-        self.root.geometry("920x680")
-        self.root.minsize(820, 600)
+        self.root.title("SortyCat🐾")
+        self.root.geometry("700x650")
+        self.root.minsize(600, 400)
+
+        try:
+            self.icon_img = tk.PhotoImage(file=resource_path("sortycat.png"))
+            self.root.iconphoto(True, self.icon_img)
+        except Exception as e:
+            print(f"Could not load window icon: {e}")
+
 
         self.folder_var = tk.StringVar()
         self.status_var = tk.StringVar(value="Select or drop a folder to begin.")
@@ -371,7 +384,7 @@ class PhotoSorterApp:
         outer = ttk.Frame(self.root, style="App.TFrame", padding=24)
         outer.pack(fill="both", expand=True)
 
-        ttk.Label(outer, text="Photo & Video Sorter", style="Title.TLabel").pack(anchor="w")
+        ttk.Label(outer, text="SortyCat🐾", style="Title.TLabel").pack(anchor="w")
         ttk.Label(
             outer,
             text="Rename media files by capture date and organize them into date folders.",
@@ -384,19 +397,15 @@ class PhotoSorterApp:
         top = tk.Frame(card, bg=self.colors["card"])
         top.pack(fill="x", padx=18, pady=(18, 8))
         tk.Label(top, text="Folder", bg=self.colors["card"], fg=self.colors["text"], font=("Segoe UI", 11, "bold")).pack(anchor="w")
-        tk.Label(
-            top,
-            text="Drag and drop a folder here, or click Browse.",
-            bg=self.colors["card"], fg=self.colors["muted"], font=("Segoe UI", 10)
-        ).pack(anchor="w", pady=(2, 0))
+        
 
-        self.drop_area = tk.Frame(card, bg="#f8fbff", highlightbackground=self.colors["border"], highlightthickness=2, bd=0, height=130)
+        self.drop_area = tk.Frame(card, bg="#f8fbff", highlightbackground=self.colors["border"], highlightthickness=2, bd=0, height=100)
         self.drop_area.pack(fill="x", padx=18, pady=(6, 12))
         self.drop_area.pack_propagate(False)
 
         self.drop_label = tk.Label(
             self.drop_area,
-            text="Drop a folder here\n\nor use Browse",
+            text="Drop a folder here\nor\n Click Browse",
             bg="#f8fbff",
             fg=self.colors["muted"],
             font=("Segoe UI", 13),
@@ -448,9 +457,9 @@ class PhotoSorterApp:
         scrollbar.pack(side="right", fill="y")
 
         self._bind_drop_target()
-        self._append_log("Welcome. Choose a folder, then click Preview or Rename and Organize.")
+        self._append_log("Welcome! Choose a folder, then click Preview or Rename and Organize.")
         if not DND_AVAILABLE:
-            self._append_log("Note: drag-and-drop is disabled because tkinterdnd2 is not installed. Browse still works.")
+            self._append_log("Note: If tkinterdnd2 is not installed, Drag and drop is not working. But You can still use the Browse button to load your folder.")
 
     def _bind_drop_target(self):
         if not DND_AVAILABLE:
